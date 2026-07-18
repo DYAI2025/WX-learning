@@ -9,7 +9,31 @@ CADDY = Path("Caddyfile")
 
 SHOP_URL = "https://sizhuatelier-shop-production.up.railway.app/"
 BAZIODIAC_URL = "https://bazodiac.space/"
-BUILD = "wu-xing-2026-07-18-v4-github"
+BUILD = "wu-xing-2026-07-18-v5-cta-alignment"
+CTA_ALIGNMENT_MARKER = "/* CTA_CARD_ALIGNMENT_V1 */"
+CTA_ALIGNMENT_CSS = """
+    /* CTA_CARD_ALIGNMENT_V1 */
+    .cta-grid {
+      align-items: stretch;
+    }
+    .cta {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .cta > h3 {
+      margin-top: 0;
+    }
+    .cta > p {
+      margin-bottom: 1.25rem;
+    }
+    .cta > .button {
+      margin-top: auto;
+      align-self: flex-start;
+      justify-content: center;
+      text-align: center;
+    }
+"""
 
 
 def replace_anchor_href(html: str, predicate, target: str) -> str:
@@ -36,12 +60,24 @@ def replace_anchor_href(html: str, predicate, target: str) -> str:
     return pattern.sub(repl, html)
 
 
+def ensure_cta_alignment(html: str) -> str:
+    if CTA_ALIGNMENT_MARKER in html:
+        return html
+    if "</style>" not in html:
+        raise SystemExit("Cannot inject CTA alignment CSS: closing style tag missing")
+    return html.replace("</style>", f"{CTA_ALIGNMENT_CSS}\n  </style>", 1)
+
+
 def update_page() -> None:
     html = PAGE.read_text(encoding="utf-8")
 
     # Public publisher / navigation brand.
     html = html.replace("Bazodiac Learn", "Sizhu Learn")
     html = html.replace("BAZODIAC LEARN", "SIZHU LEARN")
+
+    # Keep both CTA cards equal in height, their copy aligned at the top,
+    # and their buttons aligned to the shared bottom edge.
+    html = ensure_cta_alignment(html)
 
     # Build provenance.
     html = re.sub(
@@ -112,6 +148,8 @@ def update_page() -> None:
         raise SystemExit("Sizhu Atelier shop CTA missing")
     if BAZIODIAC_URL not in html:
         raise SystemExit("Bazodiac calculation CTA missing")
+    if CTA_ALIGNMENT_MARKER not in html:
+        raise SystemExit("CTA alignment CSS missing")
 
     PAGE.write_text(html, encoding="utf-8")
 
@@ -132,6 +170,7 @@ def update_runtime_metadata() -> None:
                 "SITE_BRAND=Sizhu Learn",
                 f"BAZIODIAC_CTA={BAZIODIAC_URL}",
                 f"SIZHU_SHOP_CTA={SHOP_URL}",
+                "CTA_ALIGNMENT=equal-cards-top-copy-bottom-buttons",
                 "INTERNAL_TICKET_LABELS=removed",
                 "",
             ]
