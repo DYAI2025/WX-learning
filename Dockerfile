@@ -4,7 +4,7 @@ WORKDIR /work
 COPY Caddyfile ./Caddyfile
 COPY public ./public
 COPY scripts ./scripts
-RUN python scripts/apply_public_branding.py
+RUN python scripts/apply_public_branding.py && python scripts/validate_public_content.py
 
 FROM caddy:2-alpine
 
