@@ -1,0 +1,4 @@
+WU_XING_PUBLIC_BUILD=wu-xing-2026-07-18-v2
+EXPECTED_ROUTE=/learn/wu-xing/
+IMAGES=embedded-generating-and-controlling-cycle
+INTERNAL_TICKET_LABELS=removed

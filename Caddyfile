@@ -1,0 +1,21 @@
+{
+  admin off
+  auto_https off
+}
+
+:{$PORT:8080} {
+  encode zstd gzip
+
+  header {
+    Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+    Pragma "no-cache"
+    Expires "0"
+    X-Bazodiac-Build "wu-xing-2026-07-18-v2"
+  }
+
+  @health path /health
+  respond @health "ok" 200
+
+  root * /srv
+  file_server
+}
