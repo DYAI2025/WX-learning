@@ -1,0 +1,16 @@
+{
+  "ticket": "BZG-33",
+  "status": "NOT_TESTED",
+  "preview_url": null,
+  "canonical_url": "https://sizhuatelier.shop/learn/wu-xing/tcm-organs/",
+  "desktop": "NOT_TESTED",
+  "mobile_320_390": "NOT_TESTED",
+  "keyboard": "NOT_TESTED",
+  "screen_reader_smoke": "NOT_TESTED",
+  "console_errors": "NOT_TESTED",
+  "outbound_links": "STATIC_ONLY",
+  "analytics_event_emission": "STATIC_ONLY",
+  "collector_receipts": "MISSING",
+  "accessibility_tool": "NOT_TESTED",
+  "reason": "No preview deployment or interactive browser/deployment capability is available before the pull request is built. Static validation is not represented as runtime proof."
+}

@@ -1,0 +1,29 @@
+{
+  "build": "wu-xing-tcm-organs-2026-07-19-v1",
+  "title": "Wu Xing, TCM and Organs: A Historical Correspondence Guide",
+  "canonical": "https://sizhuatelier.shop/learn/wu-xing/tcm-organs/",
+  "region_policy": "CN_SIMPLIFIED",
+  "terminology": {
+    "五行": "wǔxíng",
+    "木": "mù",
+    "火": "huǒ",
+    "土": "tǔ",
+    "金": "jīn",
+    "水": "shuǐ"
+  },
+  "correspondences": [
+    {"phase":"Wood","hanzi":"木","pinyin":"mù","zang":"Liver system","fu":"Gallbladder system","season":"Spring","orientation":"East","emotion":"Anger","status":"VERIFIED traditional correspondence"},
+    {"phase":"Fire","hanzi":"火","pinyin":"huǒ","zang":"Heart system","fu":"Small Intestine system","season":"Summer","orientation":"South","emotion":"Joy","status":"VERIFIED traditional correspondence"},
+    {"phase":"Earth","hanzi":"土","pinyin":"tǔ","zang":"Spleen system","fu":"Stomach system","season":"Center; later tables may use late summer or transitions","orientation":"Center","emotion":"Thoughtfulness / pensiveness","status":"CONTEXTUAL_VARIANT for season"},
+    {"phase":"Metal","hanzi":"金","pinyin":"jīn","zang":"Lung system","fu":"Large Intestine system","season":"Autumn","orientation":"West","emotion":"Sorrow / grief","status":"VERIFIED with translation variant"},
+    {"phase":"Water","hanzi":"水","pinyin":"shuǐ","zang":"Kidney system","fu":"Bladder system","season":"Winter","orientation":"North","emotion":"Fear","status":"VERIFIED traditional correspondence"}
+  ],
+  "excluded_claims": [
+    "biomedical organ equivalence",
+    "symptom diagnosis",
+    "treatment recommendations",
+    "preventive efficacy",
+    "herbal or acupuncture guidance",
+    "personality or destiny inference"
+  ]
+}

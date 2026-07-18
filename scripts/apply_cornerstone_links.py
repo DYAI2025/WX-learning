@@ -9,8 +9,9 @@ PAGE = Path("public/learn/wu-xing/index.html")
 VERSION = Path("public/version.txt")
 CADDY = Path("Caddyfile")
 REGISTRY = Path("config/cornerstone-links.json")
-BUILD = "wu-xing-2026-07-19-v7-link-registry"
-MARKER = "CORNERSTONE_FENG_SHUI_LINK_V1"
+BUILD = "wu-xing-2026-07-19-v8-tcm-organs-link"
+FENG_SHUI_MARKER = "CORNERSTONE_FENG_SHUI_LINK_V1"
+TCM_MARKER = "CORNERSTONE_TCM_ORGANS_LINK_V1"
 
 ANCHOR_RE = re.compile(r"<a\b(?P<attrs>[^>]*)>(?P<body>.*?)</a>", re.I | re.S)
 HREF_RE = re.compile(r"\bhref\s*=\s*([\"'])(?P<href>.*?)\1", re.I | re.S)
@@ -28,11 +29,14 @@ def load_registry() -> dict[str, str]:
     data = json.loads(REGISTRY.read_text(encoding="utf-8"))
     required = {
         "sizhu_atelier",
+        "sizhu_atelier_operational",
         "sizhu_atelier_etsy",
         "bazi_chart",
         "zi_wei_dou_shu_chart",
         "wu_xing_foundations",
+        "wu_xing_foundations_operational",
         "wu_xing_feng_shui",
+        "wu_xing_tcm_organs",
     }
     missing = sorted(required - data.keys())
     if missing:
@@ -48,7 +52,7 @@ def set_href(attrs: str, target: str) -> str:
 
 def rewrite_anchors(html: str, links: dict[str, str]) -> str:
     legacy_targets = {
-        "https://sizhuatelier.shop/": links["sizhu_atelier"],
+        "https://sizhuatelier-shop-production.up.railway.app/": links["sizhu_atelier"],
         "https://bazodiac.space/": links["bazi_chart"],
         "https://www.bazodiac.space/": links["bazi_chart"],
         "https://bazodiac.space/atlas/": links["bazi_chart"],
@@ -66,6 +70,8 @@ def rewrite_anchors(html: str, links: dict[str, str]) -> str:
 
         if analytics_match and analytics_match.group("event") == "feng-shui":
             target = links["wu_xing_feng_shui"]
+        elif analytics_match and analytics_match.group("event") == "tcm-organs":
+            target = links["wu_xing_tcm_organs"]
         elif (
             'data-analytics="product"' in probe
             or "poster" in probe
@@ -107,10 +113,18 @@ def insert_before_matching_div(html: str, start_marker: str, addition: str) -> s
 
 
 def ensure_feng_shui_card(html: str, links: dict[str, str]) -> str:
-    if MARKER in html:
+    if FENG_SHUI_MARKER in html:
         return html
-    card = f'''<!-- {MARKER} -->
+    card = f'''<!-- {FENG_SHUI_MARKER} -->
 <div class="cta"><h3>Continue with Wu Xing and Feng Shui</h3><p>See how the Five Phases are used to relate direction, season, colour and space in a source-oriented Feng Shui guide.</p><a class="button secondary" href="{links['wu_xing_feng_shui']}" data-analytics="feng-shui">Read the Feng Shui guide</a></div>'''
+    return insert_before_matching_div(html, '<div class="cta-grid">', card)
+
+
+def ensure_tcm_organs_card(html: str, links: dict[str, str]) -> str:
+    if TCM_MARKER in html:
+        return html
+    card = f'''<!-- {TCM_MARKER} -->
+<div class="cta"><h3>Wu Xing, TCM and organ systems</h3><p>Explore the historical correspondences among phases, zang-fu systems, seasons and emotions—with explicit medical limits.</p><a class="button secondary" href="{links['wu_xing_tcm_organs']}" data-analytics="tcm-organs">Read the TCM and organs guide</a></div>'''
     return insert_before_matching_div(html, '<div class="cta-grid">', card)
 
 
@@ -130,7 +144,7 @@ def update_build_markers(html: str) -> str:
     )
     html = re.sub(
         r'("dateModified"\s*:\s*")[^"]+("\s*)',
-        r'\g<1>2026-07-19T00:30:00+02:00\2',
+        r'\g<1>2026-07-19T01:30:00+02:00\2',
         html,
         count=1,
     )
@@ -142,16 +156,22 @@ def update_runtime_metadata(links: dict[str, str]) -> None:
         "\n".join(
             [
                 f"WU_XING_PUBLIC_BUILD={BUILD}",
+                "TCM_ORGANS_BUILD=wu-xing-tcm-organs-2026-07-19-v1",
                 "EXPECTED_ROUTE=/learn/wu-xing/",
+                "TCM_ORGANS_ROUTE=/learn/wu-xing/tcm-organs/",
                 "SITE_BRAND=Sizhu Learn",
                 f"PUBLIC_WU_XING_URL={links['wu_xing_foundations']}",
+                f"OPERATIONAL_WU_XING_URL={links['wu_xing_foundations_operational']}",
+                f"TCM_ORGANS_GUIDE={links['wu_xing_tcm_organs']}",
                 f"FENG_SHUI_GUIDE={links['wu_xing_feng_shui']}",
                 f"BAZIODIAC_CTA={links['bazi_chart']}",
                 f"SIZHU_SHOP_CTA={links['sizhu_atelier']}",
+                f"SIZHU_SHOP_OPERATIONAL={links['sizhu_atelier_operational']}",
                 f"SIZHU_ETSY={links['sizhu_atelier_etsy']}",
                 f"ZI_WEI_DOU_SHU_CHART={links['zi_wei_dou_shu_chart']}",
                 "CTA_ALIGNMENT=equal-cards-top-copy-bottom-buttons",
                 "EXPERT_REVIEW=historical-nuance-classical-anchors-modern-analogy-source-precision",
+                "TCM_CLAIMS_POLICY=historical-correspondence-no-diagnosis-treatment-prevention-efficacy",
                 "LINK_POLICY=config-cornerstone-links-json",
                 "INTERNAL_TICKET_LABELS=removed",
                 "",
@@ -173,6 +193,7 @@ def main() -> int:
     html = PAGE.read_text(encoding="utf-8")
     html = rewrite_anchors(html, links)
     html = ensure_feng_shui_card(html, links)
+    html = ensure_tcm_organs_card(html, links)
     html = rewrite_anchors(html, links)
     html = update_build_markers(html)
     PAGE.write_text(html, encoding="utf-8")

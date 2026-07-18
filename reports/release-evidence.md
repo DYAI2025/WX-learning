@@ -1,0 +1,23 @@
+## Release evidence
+
+- Operating Jira issue: BZG-33
+- Parent context: BZG-7
+- Repository: DYAI2025/WX-learning
+- Branch: feature/bzg-33-wu-xing-tcm-organs
+- Pull request: PENDING
+- Merge SHA: MISSING
+- Deployment ID or digest: MISSING
+- Canonical URL: https://sizhuatelier.shop/learn/wu-xing/tcm-organs/
+- Operational URL: MISSING
+- Health check: NOT_TESTED
+- Version marker: wu-xing-tcm-organs-2026-07-19-v1
+- Static QA: STATIC_VALIDATED
+- Browser/mobile QA: NOT_TESTED
+- Accessibility: STATIC_STRUCTURE_ONLY
+- Analytics: STATIC_EVENT_HOOKS_ONLY
+- Editorial review: SOURCE_AND_CLAIMS_REVIEWED_BY_ORCHESTRATOR; NAMED_HUMAN_REVIEW_MISSING
+- Technical review: PENDING_PR
+- Dependencies: BZG-29 OPEN; BZG-30 OPEN; BZG-31 DONE
+- Known limitations: canonical routing and deployment control unavailable; analytics collector contract missing
+- Rollback point: repository default branch before BZG-33 merge
+- Release status: DRAFT_BUILT
