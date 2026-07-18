@@ -2,14 +2,19 @@
 from __future__ import annotations
 
 import json
-import re
 import sys
 from html.parser import HTMLParser
 from pathlib import Path
 
 PAGE = Path("public/learn/wu-xing/index.html")
 VERSION = Path("public/version.txt")
-EXPECTED_BUILD = "wu-xing-2026-07-18-v6-expert-review"
+EXPECTED_BUILD = "wu-xing-2026-07-19-v7-link-registry"
+SHOP = "https://sizhuatelier-shop-production.up.railway.app/"
+ETSY = "https://www.etsy.com/de/shop/SizhuAtelier?ref=profile_header"
+BAZI = "https://bazi-custom-app-production.up.railway.app/"
+ZWDS = "https://zwds-chart-production.up.railway.app/"
+WU_XING = "https://wx-learning-production-48d2.up.railway.app/learn/wu-xing/"
+FENG_SHUI = "https://sizhuatelier.shop/learn/wu-xing/feng-shui/"
 
 REQUIRED_TEXT = [
     "Rather than presenting the five categories only as inert substances",
@@ -27,8 +32,10 @@ REQUIRED_TEXT = [
     "John S. Major, Sarah A. Queen, Andrew Seth Meyer, and Harold D. Roth",
     "https://cup.columbia.edu/book/the-huainanzi/9780231142045/",
     "https://www.dpm.org.cn/lemmas/244166.html",
-    "https://sizhuatelier-shop-production.up.railway.app/",
-    "https://bazodiac.space/",
+    SHOP,
+    BAZI,
+    FENG_SHUI,
+    "CORNERSTONE_FENG_SHUI_LINK_V1",
     "Sizhu Learn",
 ]
 
@@ -39,6 +46,8 @@ FORBIDDEN_TEXT = [
     "Bazodiac Learn",
     "BAZODIAC LEARN",
     "BZG-",
+    "https://bazodiac.space/",
+    "https://www.bazodiac.space/",
 ]
 
 TOKENS = {
@@ -63,6 +72,7 @@ class AuditParser(HTMLParser):
         self._json_ld = False
         self._json_chunks: list[str] = []
         self.figure_labels: list[str] = []
+        self.hrefs: set[str] = set()
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         data = dict(attrs)
@@ -74,6 +84,8 @@ class AuditParser(HTMLParser):
                 self.img_missing_alt.append(data.get("src", "<missing src>"))
         elif tag == "figure":
             self.figure_labels.append(data.get("aria-labelledby", ""))
+        elif tag == "a":
+            self.hrefs.add(data.get("href", ""))
         elif tag == "script" and data.get("type") == "application/ld+json":
             self._json_ld = True
             self._json_chunks = []
@@ -112,6 +124,8 @@ def main() -> int:
         fail("controlling-cycle interpretation note must appear exactly once")
     if html.count("CTA_CARD_ALIGNMENT_V1") != 1:
         fail("CTA alignment CSS marker must appear exactly once")
+    if html.count("CORNERSTONE_FENG_SHUI_LINK_V1") != 1:
+        fail("reciprocal Feng Shui CTA marker must appear exactly once")
 
     for hanzi, pinyin in TOKENS.items():
         if hanzi not in html:
@@ -140,6 +154,10 @@ def main() -> int:
     if not isinstance(graph, list) or not graph:
         fail("JSON-LD @graph missing or empty")
 
+    for target in (SHOP, BAZI, FENG_SHUI):
+        if target not in parser.hrefs:
+            fail(f"required CTA route missing: {target}")
+
     if f"PUBLIC_BUILD: {EXPECTED_BUILD}" not in html:
         fail("HTML build marker missing")
     if f'content="{EXPECTED_BUILD}"' not in html:
@@ -147,17 +165,23 @@ def main() -> int:
     if not VERSION.exists():
         fail("version.txt missing")
     version = VERSION.read_text(encoding="utf-8")
-    if f"WU_XING_PUBLIC_BUILD={EXPECTED_BUILD}" not in version:
-        fail("version.txt build marker missing")
-    if "EXPERT_REVIEW=historical-nuance-classical-anchors-modern-analogy-source-precision" not in version:
-        fail("version.txt expert-review marker missing")
+    for marker in (
+        f"WU_XING_PUBLIC_BUILD={EXPECTED_BUILD}",
+        f"PUBLIC_WU_XING_URL={WU_XING}",
+        f"FENG_SHUI_GUIDE={FENG_SHUI}",
+        f"BAZIODIAC_CTA={BAZI}",
+        f"SIZHU_SHOP_CTA={SHOP}",
+        f"SIZHU_ETSY={ETSY}",
+        f"ZI_WEI_DOU_SHU_CHART={ZWDS}",
+        "LINK_POLICY=config-cornerstone-links-json",
+    ):
+        if marker not in version:
+            fail(f"version marker missing: {marker}")
 
     print("PASS: public Wu Xing content validated")
-    print("- historical framing nuanced")
-    print("- classical anchors and modern analogies separated")
-    print("- cycle terminology and diagram notes validated")
-    print("- source precision and JSON-LD validated")
-    print("- Hanzi, Pinyin, CTA routes, images, and accessibility checks passed")
+    print("- authoritative production routes and reciprocal Feng Shui link validated")
+    print("- historical framing, sources, Hanzi, Pinyin and accessibility passed")
+    print("- legacy Bazodiac and placeholder destinations blocked")
     return 0
 
 
