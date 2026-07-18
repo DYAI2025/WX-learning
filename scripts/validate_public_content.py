@@ -8,13 +8,14 @@ from pathlib import Path
 
 PAGE = Path("public/learn/wu-xing/index.html")
 VERSION = Path("public/version.txt")
-EXPECTED_BUILD = "wu-xing-2026-07-19-v7-link-registry"
-SHOP = "https://sizhuatelier-shop-production.up.railway.app/"
+EXPECTED_BUILD = "wu-xing-2026-07-19-v8-tcm-organs-link"
+SHOP = "https://sizhuatelier.shop/"
 ETSY = "https://www.etsy.com/de/shop/SizhuAtelier?ref=profile_header"
 BAZI = "https://bazi-custom-app-production.up.railway.app/"
 ZWDS = "https://zwds-chart-production.up.railway.app/"
-WU_XING = "https://wx-learning-production-48d2.up.railway.app/learn/wu-xing/"
+WU_XING = "https://sizhuatelier.shop/learn/wu-xing/"
 FENG_SHUI = "https://sizhuatelier.shop/learn/wu-xing/feng-shui/"
+TCM_ORGANS = "https://sizhuatelier.shop/learn/wu-xing/tcm-organs/"
 
 REQUIRED_TEXT = [
     "Rather than presenting the five categories only as inert substances",
@@ -35,7 +36,9 @@ REQUIRED_TEXT = [
     SHOP,
     BAZI,
     FENG_SHUI,
+    TCM_ORGANS,
     "CORNERSTONE_FENG_SHUI_LINK_V1",
+    "CORNERSTONE_TCM_ORGANS_LINK_V1",
     "Sizhu Learn",
 ]
 
@@ -126,6 +129,8 @@ def main() -> int:
         fail("CTA alignment CSS marker must appear exactly once")
     if html.count("CORNERSTONE_FENG_SHUI_LINK_V1") != 1:
         fail("reciprocal Feng Shui CTA marker must appear exactly once")
+    if html.count("CORNERSTONE_TCM_ORGANS_LINK_V1") != 1:
+        fail("reciprocal TCM organs CTA marker must appear exactly once")
 
     for hanzi, pinyin in TOKENS.items():
         if hanzi not in html:
@@ -154,7 +159,7 @@ def main() -> int:
     if not isinstance(graph, list) or not graph:
         fail("JSON-LD @graph missing or empty")
 
-    for target in (SHOP, BAZI, FENG_SHUI):
+    for target in (SHOP, BAZI, FENG_SHUI, TCM_ORGANS):
         if target not in parser.hrefs:
             fail(f"required CTA route missing: {target}")
 
@@ -167,7 +172,9 @@ def main() -> int:
     version = VERSION.read_text(encoding="utf-8")
     for marker in (
         f"WU_XING_PUBLIC_BUILD={EXPECTED_BUILD}",
+        "TCM_ORGANS_BUILD=wu-xing-tcm-organs-2026-07-19-v1",
         f"PUBLIC_WU_XING_URL={WU_XING}",
+        f"TCM_ORGANS_GUIDE={TCM_ORGANS}",
         f"FENG_SHUI_GUIDE={FENG_SHUI}",
         f"BAZIODIAC_CTA={BAZI}",
         f"SIZHU_SHOP_CTA={SHOP}",
@@ -179,7 +186,7 @@ def main() -> int:
             fail(f"version marker missing: {marker}")
 
     print("PASS: public Wu Xing content validated")
-    print("- authoritative production routes and reciprocal Feng Shui link validated")
+    print("- authoritative production routes and reciprocal supporting-page links validated")
     print("- historical framing, sources, Hanzi, Pinyin and accessibility passed")
     print("- legacy Bazodiac and placeholder destinations blocked")
     return 0

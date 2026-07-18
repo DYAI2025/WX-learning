@@ -1,0 +1,37 @@
+{
+  "ticket": "BZG-33",
+  "validated_at": "2026-07-19T01:30:00+02:00",
+  "status": "PASS",
+  "evidence_class": "STATIC_VALIDATED",
+  "commands": [
+    "python scripts/validate_tcm_organs.py",
+    "python -m py_compile scripts/apply_cornerstone_links.py scripts/validate_public_content.py scripts/validate_tcm_organs.py",
+    "HTMLParser feed public/learn/wu-xing/tcm-organs/index.html"
+  ],
+  "passed": [
+    "source inventory present",
+    "claim matrix schema and confidence values valid",
+    "structured content source valid",
+    "medical positive-claim exclusion patterns clear",
+    "CN_SIMPLIFIED and verified Hanzi/Pinyin tokens present",
+    "single H1 and semantic landmarks",
+    "captioned table with row and column scopes",
+    "focus-visible and reduced-motion CSS",
+    "320px-oriented responsive rules and table overflow handling",
+    "unique canonical, robots, Open Graph and Twitter metadata",
+    "valid JSON-LD graph with visible glossary support",
+    "authoritative hub, related, shop, Etsy and BaZi routes",
+    "stable analytics hooks",
+    "sitemap and robots entries",
+    "Python syntax compilation"
+  ],
+  "not_proven": [
+    "browser rendering",
+    "mobile visual quality",
+    "keyboard focus order in a live browser",
+    "WCAG conformance",
+    "analytics collector receipt",
+    "canonical deployment",
+    "named qualified human review"
+  ]
+}

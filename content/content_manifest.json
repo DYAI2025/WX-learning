@@ -1,0 +1,101 @@
+{
+  "ticket": "BZG-33",
+  "parent_context": "BZG-7",
+  "page_type": "supporting_deep_dive",
+  "language": "en",
+  "canonical_url": "https://sizhuatelier.shop/learn/wu-xing/tcm-organs/",
+  "operational_url": "MISSING_UNTIL_DEPLOYMENT",
+  "user_outcome": "Give English-language readers a source-oriented explanation of traditional Wu Xing correspondences among phases, zang-fu systems, seasons, directions and emotions without presenting them as biomedical diagnosis or treatment.",
+  "search_intent": "Informational: understand Wu Xing organ correspondences and their historical limits.",
+  "page_promise": "Explain what the traditional organ correspondences mean, where they appear in classical literature, how translations vary, and what they cannot establish medically.",
+  "scope": [
+    "traditional five-phase correspondences",
+    "zang and fu terminology",
+    "seasonal and directional correspondences",
+    "emotion terms and translation variants",
+    "historical source layers",
+    "medical and epistemic limits"
+  ],
+  "excluded_topics": [
+    "diagnosis",
+    "treatment",
+    "prevention",
+    "dosage",
+    "efficacy",
+    "symptom-to-phase self-assessment",
+    "personalized health interpretation",
+    "herbal prescriptions",
+    "acupuncture recommendations"
+  ],
+  "foundation_page": "https://sizhuatelier.shop/learn/wu-xing/",
+  "related_pages": [
+    "https://sizhuatelier.shop/learn/wu-xing/feng-shui/"
+  ],
+  "sections": [
+    "Orientation and safety boundary",
+    "What organ language means in this context",
+    "Historical layers and source method",
+    "Five-phase correspondence matrix",
+    "Five phase-specific explanations",
+    "Translation and lineage variants",
+    "What the model cannot establish",
+    "Summary",
+    "Glossary",
+    "Sources and further reading",
+    "Related learning and contextual CTAs"
+  ],
+  "glossary_terms": [
+    "Wu Xing",
+    "Five Phases",
+    "zang",
+    "fu",
+    "correlative system",
+    "Huangdi Neijing"
+  ],
+  "source_ids": ["S001", "S002", "S003", "S004", "S005", "S006", "S007", "S008"],
+  "claim_matrix": "research/claim_matrix.csv",
+  "region_policy": "CN_SIMPLIFIED",
+  "structured_data": [
+    "Organization",
+    "WebSite",
+    "WebPage",
+    "Article",
+    "BreadcrumbList",
+    "DefinedTermSet"
+  ],
+  "analytics_events": [
+    "learn_hub_click",
+    "related_page_click",
+    "cta_shop_click",
+    "cta_etsy_click",
+    "cta_bazi_chart_click",
+    "section_view",
+    "scroll_depth_25",
+    "scroll_depth_50",
+    "scroll_depth_75",
+    "scroll_depth_100"
+  ],
+  "accessibility_requirements": [
+    "single_h1",
+    "skip_link",
+    "semantic_landmarks",
+    "focus_visible",
+    "reduced_motion",
+    "table_headers_and_caption",
+    "responsive_320px",
+    "no_horizontal_page_overflow",
+    "descriptive_link_text"
+  ],
+  "review_requirements": [
+    "editorial source review",
+    "Chinese terminology review",
+    "medical-claims exclusion review",
+    "runtime mobile and keyboard review before release"
+  ],
+  "release_status": "DRAFT_BUILT",
+  "assumptions": [
+    "DYAI2025/WX-learning is the target repository because it owns the canonical Wu Xing hub and already provides the applicable Caddy/Railway architecture.",
+    "BZG-29 and BZG-30 remain open, so their intended IA and claims rules are implemented locally but not represented as completed dependencies.",
+    "The canonical Sizhu Atelier domain remains the public identity even if an operational Railway URL is used for preview or deployment verification."
+  ]
+}
