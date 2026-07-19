@@ -1,0 +1,81 @@
+name: Validate Learn Routes
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build BaZi source
+        run: python scripts/build_bazi.py
+      - name: Apply public branding
+        run: python scripts/apply_public_branding.py
+      - name: Apply cornerstone links
+        run: python scripts/apply_cornerstone_links.py
+      - name: Normalize legacy URLs
+        run: python scripts/normalize_legacy_urls.py
+      - name: Validate Wu Xing hub
+        run: python scripts/validate_public_content.py
+      - name: Validate TCM source page
+        run: python scripts/validate_tcm_organs.py
+      - name: Apply BaZi runtime metadata
+        run: python scripts/apply_bazi_runtime_metadata.py
+      - name: Validate BaZi page
+        run: python scripts/validate_bazi.py
+      - name: Normalize internal routes
+        run: python scripts/normalize_internal_routes.py
+      - name: Apply Railway operational routes
+        run: python scripts/apply_operational_routes.py
+      - name: Assert Wu Xing operational canonical
+        run: grep -Fq '<link rel="canonical" href="https://wx-learning-production-48d2.up.railway.app/learn/wu-xing/">' public/learn/wu-xing/index.html
+      - name: Assert flat TCM artifact
+        run: test -f public/learn/wu-xing-tcm-organs/index.html
+      - name: Assert flat TCM operational canonical
+        run: grep -Fq '<link rel="canonical" href="https://wx-learning-production-48d2.up.railway.app/learn/wu-xing-tcm-organs/">' public/learn/wu-xing-tcm-organs/index.html
+      - name: Assert BaZi operational canonical
+        run: grep -Fq '<link rel="canonical" href="https://wx-learning-production-48d2.up.railway.app/learn/bazi/">' public/learn/bazi/index.html
+      - name: Assert nested TCM compatibility artifact
+        run: test -f public/learn/wu-xing/tcm-organs/index.html
+      - name: Assert Wu Xing sitemap route
+        run: grep -Fq 'https://wx-learning-production-48d2.up.railway.app/learn/wu-xing/' public/sitemap.xml
+      - name: Assert flat TCM sitemap route
+        run: grep -Fq 'https://wx-learning-production-48d2.up.railway.app/learn/wu-xing-tcm-organs/' public/sitemap.xml
+      - name: Assert BaZi sitemap route
+        run: grep -Fq 'https://wx-learning-production-48d2.up.railway.app/learn/bazi/' public/sitemap.xml
+      - name: Assert operational version markers
+        run: |
+          grep -Fq 'PUBLIC_ORIGIN=https://wx-learning-production-48d2.up.railway.app' public/version.txt
+          grep -Fq 'WU_XING_OPERATIONAL_ROUTE=/learn/wu-xing/' public/version.txt
+          grep -Fq 'TCM_ORGANS_OPERATIONAL_ROUTE=/learn/wu-xing-tcm-organs/' public/version.txt
+          grep -Fq 'BAZI_OPERATIONAL_ROUTE=/learn/bazi/' public/version.txt
+      - name: Validate Railway route contract
+        run: python scripts/validate_operational_routes.py
+      - name: Restore clean checkout for Docker build
+        run: |
+          git reset --hard HEAD
+          git clean -fdx
+      - name: Build Railway image
+        run: docker build -t wx-learning-route-check .
+      - name: Start container
+        run: |
+          docker run -d --name wx-learning-route-check -p 8080:8080 wx-learning-route-check
+          for i in $(seq 1 20); do
+            curl -fsS http://127.0.0.1:8080/health && break
+            sleep 1
+          done
+      - name: Verify operational routes
+        run: |
+          curl -fsS http://127.0.0.1:8080/learn/wu-xing/ | grep -q "Wu Xing"
+          curl -fsS http://127.0.0.1:8080/learn/wu-xing-tcm-organs/ | grep -q "Wu Xing, TCM and Organs"
+          curl -fsS http://127.0.0.1:8080/learn/bazi/ | grep -q "BaZi Complete Guide"
+          curl -fsS http://127.0.0.1:8080/learn/wu-xing/tcm-organs/ | grep -q "Wu Xing, TCM and Organs"
+          curl -fsS http://127.0.0.1:8080/version.txt | grep -q "TCM_ORGANS_OPERATIONAL_ROUTE=/learn/wu-xing-tcm-organs/"
+          curl -fsS http://127.0.0.1:8080/version.txt | grep -q "BAZI_OPERATIONAL_ROUTE=/learn/bazi/"
+      - name: Show container logs on failure
+        if: failure()
+        run: docker logs wx-learning-route-check || true

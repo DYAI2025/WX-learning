@@ -16,7 +16,9 @@ RUN python scripts/build_bazi.py \
  && python scripts/validate_tcm_organs.py \
  && python scripts/apply_bazi_runtime_metadata.py \
  && python scripts/validate_bazi.py \
- && python scripts/normalize_internal_routes.py
+ && python scripts/normalize_internal_routes.py \
+ && python scripts/apply_operational_routes.py \
+ && python scripts/validate_operational_routes.py
 
 FROM caddy:2-alpine
 COPY --from=prepare /work/Caddyfile /etc/caddy/Caddyfile
