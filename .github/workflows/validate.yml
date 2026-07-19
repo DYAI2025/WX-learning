@@ -11,15 +11,30 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Build BaZi source
+        run: python scripts/build_bazi.py
+      - name: Apply public branding
+        run: python scripts/apply_public_branding.py
+      - name: Apply cornerstone links
+        run: python scripts/apply_cornerstone_links.py
+      - name: Normalize legacy URLs
+        run: python scripts/normalize_legacy_urls.py
+      - name: Validate Wu Xing hub
+        run: python scripts/validate_public_content.py
+      - name: Validate TCM source page
+        run: python scripts/validate_tcm_organs.py
+      - name: Apply BaZi runtime metadata
+        run: python scripts/apply_bazi_runtime_metadata.py
+      - name: Validate BaZi page
+        run: python scripts/validate_bazi.py
+      - name: Normalize internal routes
+        run: python scripts/normalize_internal_routes.py
+      - name: Apply Railway operational routes
+        run: python scripts/apply_operational_routes.py
+      - name: Validate Railway route contract
+        run: python scripts/validate_operational_routes.py
       - name: Build Railway image
-        shell: bash
-        run: |
-          set -o pipefail
-          if ! docker build -t wx-learning-route-check . > build.log 2>&1; then
-            echo "Docker build failed. Last 100 log lines:"
-            tail -n 100 build.log
-            exit 1
-          fi
+        run: docker build -t wx-learning-route-check .
       - name: Start container
         run: |
           docker run -d --name wx-learning-route-check -p 8080:8080 wx-learning-route-check
