@@ -6,6 +6,7 @@ from pathlib import Path
 
 PUBLIC = Path("public")
 ORIGIN = "https://wx-learning-production-48d2.up.railway.app"
+WU_XING_ROUTE = "/learn/wu-xing/"
 BAZI_ROUTE = "/learn/bazi/"
 TCM_SOURCE_ROUTE = "/learn/wu-xing/tcm-organs/"
 TCM_PUBLIC_ROUTE = "/learn/wu-xing-tcm-organs/"
@@ -19,26 +20,34 @@ def replace_all(path: Path, replacements: dict[str, str]) -> None:
 
 
 def main() -> int:
+    wu_xing = PUBLIC / "learn" / "wu-xing" / "index.html"
     bazi = PUBLIC / "learn" / "bazi" / "index.html"
     tcm_source = PUBLIC / "learn" / "wu-xing" / "tcm-organs"
     tcm_public = PUBLIC / "learn" / "wu-xing-tcm-organs"
     sitemap = PUBLIC / "sitemap.xml"
     version = PUBLIC / "version.txt"
 
-    if not bazi.exists():
-        raise SystemExit(f"missing BaZi output: {bazi}")
-    if not (tcm_source / "index.html").exists():
-        raise SystemExit(f"missing TCM source route: {tcm_source}")
+    for path in (wu_xing, bazi, tcm_source / "index.html", sitemap):
+        if not path.exists():
+            raise SystemExit(f"missing required build artifact: {path}")
 
     if tcm_public.exists():
         shutil.rmtree(tcm_public)
     shutil.copytree(tcm_source, tcm_public)
 
     replace_all(
+        wu_xing,
+        {
+            "https://sizhuatelier.shop/learn/wu-xing/": f"{ORIGIN}{WU_XING_ROUTE}",
+            "https://sizhuatelier.shop/learn/wu-xing/tcm-organs/": f"{ORIGIN}{TCM_PUBLIC_ROUTE}",
+        },
+    )
+
+    replace_all(
         bazi,
         {
             "https://sizhuatelier.shop/learn/bazi/": f"{ORIGIN}{BAZI_ROUTE}",
-            "https://sizhuatelier.shop/learn/wu-xing/": f"{ORIGIN}/learn/wu-xing/",
+            "https://sizhuatelier.shop/learn/wu-xing/": f"{ORIGIN}{WU_XING_ROUTE}",
         },
     )
 
@@ -46,7 +55,7 @@ def main() -> int:
         tcm_public / "index.html",
         {
             "https://sizhuatelier.shop/learn/wu-xing/tcm-organs/": f"{ORIGIN}{TCM_PUBLIC_ROUTE}",
-            "https://sizhuatelier.shop/learn/wu-xing/": f"{ORIGIN}/learn/wu-xing/",
+            "https://sizhuatelier.shop/learn/wu-xing/": f"{ORIGIN}{WU_XING_ROUTE}",
         },
     )
 
@@ -54,7 +63,7 @@ def main() -> int:
         sitemap,
         {
             "https://sizhuatelier.shop/learn/bazi/": f"{ORIGIN}{BAZI_ROUTE}",
-            "https://sizhuatelier.shop/learn/wu-xing/": f"{ORIGIN}/learn/wu-xing/",
+            "https://sizhuatelier.shop/learn/wu-xing/": f"{ORIGIN}{WU_XING_ROUTE}",
             "https://sizhuatelier.shop/learn/wu-xing/tcm-organs/": f"{ORIGIN}{TCM_PUBLIC_ROUTE}",
         },
     )
@@ -62,6 +71,7 @@ def main() -> int:
     lines = version.read_text(encoding="utf-8").splitlines() if version.exists() else []
     markers = {
         "PUBLIC_ORIGIN": ORIGIN,
+        "WU_XING_OPERATIONAL_ROUTE": WU_XING_ROUTE,
         "BAZI_OPERATIONAL_ROUTE": BAZI_ROUTE,
         "TCM_ORGANS_OPERATIONAL_ROUTE": TCM_PUBLIC_ROUTE,
         "TCM_ORGANS_LEGACY_ROUTE": TCM_SOURCE_ROUTE,
@@ -71,6 +81,7 @@ def main() -> int:
     version.write_text("\n".join(retained) + "\n", encoding="utf-8")
 
     print("PASS: applied Railway operational routes")
+    print(f"- Wu Xing: {ORIGIN}{WU_XING_ROUTE}")
     print(f"- BaZi: {ORIGIN}{BAZI_ROUTE}")
     print(f"- TCM organs: {ORIGIN}{TCM_PUBLIC_ROUTE}")
     print(f"- legacy TCM route retained: {TCM_SOURCE_ROUTE}")
