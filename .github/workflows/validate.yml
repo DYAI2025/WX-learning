@@ -1,0 +1,33 @@
+name: Validate Learn Routes
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Railway image
+        run: docker build -t wx-learning-route-check .
+      - name: Start container
+        run: |
+          docker run -d --name wx-learning-route-check -p 8080:8080 wx-learning-route-check
+          for i in $(seq 1 20); do
+            curl -fsS http://127.0.0.1:8080/health && break
+            sleep 1
+          done
+      - name: Verify operational routes
+        run: |
+          curl -fsS http://127.0.0.1:8080/learn/wu-xing/ | grep -q "Wu Xing"
+          curl -fsS http://127.0.0.1:8080/learn/wu-xing-tcm-organs/ | grep -q "Wu Xing, TCM and Organs"
+          curl -fsS http://127.0.0.1:8080/learn/bazi/ | grep -q "BaZi Complete Guide"
+          curl -fsS http://127.0.0.1:8080/learn/wu-xing/tcm-organs/ | grep -q "Wu Xing, TCM and Organs"
+          curl -fsS http://127.0.0.1:8080/version.txt | grep -q "TCM_ORGANS_OPERATIONAL_ROUTE=/learn/wu-xing-tcm-organs/"
+          curl -fsS http://127.0.0.1:8080/version.txt | grep -q "BAZI_OPERATIONAL_ROUTE=/learn/bazi/"
+      - name: Show container logs on failure
+        if: failure()
+        run: docker logs wx-learning-route-check || true
