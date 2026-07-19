@@ -31,6 +31,28 @@ jobs:
         run: python scripts/normalize_internal_routes.py
       - name: Apply Railway operational routes
         run: python scripts/apply_operational_routes.py
+      - name: Assert Wu Xing operational canonical
+        run: grep -Fq '<link rel="canonical" href="https://wx-learning-production-48d2.up.railway.app/learn/wu-xing/">' public/learn/wu-xing/index.html
+      - name: Assert flat TCM artifact
+        run: test -f public/learn/wu-xing-tcm-organs/index.html
+      - name: Assert flat TCM operational canonical
+        run: grep -Fq '<link rel="canonical" href="https://wx-learning-production-48d2.up.railway.app/learn/wu-xing-tcm-organs/">' public/learn/wu-xing-tcm-organs/index.html
+      - name: Assert BaZi operational canonical
+        run: grep -Fq '<link rel="canonical" href="https://wx-learning-production-48d2.up.railway.app/learn/bazi/">' public/learn/bazi/index.html
+      - name: Assert nested TCM compatibility artifact
+        run: test -f public/learn/wu-xing/tcm-organs/index.html
+      - name: Assert Wu Xing sitemap route
+        run: grep -Fq 'https://wx-learning-production-48d2.up.railway.app/learn/wu-xing/' public/sitemap.xml
+      - name: Assert flat TCM sitemap route
+        run: grep -Fq 'https://wx-learning-production-48d2.up.railway.app/learn/wu-xing-tcm-organs/' public/sitemap.xml
+      - name: Assert BaZi sitemap route
+        run: grep -Fq 'https://wx-learning-production-48d2.up.railway.app/learn/bazi/' public/sitemap.xml
+      - name: Assert operational version markers
+        run: |
+          grep -Fq 'PUBLIC_ORIGIN=https://wx-learning-production-48d2.up.railway.app' public/version.txt
+          grep -Fq 'WU_XING_OPERATIONAL_ROUTE=/learn/wu-xing/' public/version.txt
+          grep -Fq 'TCM_ORGANS_OPERATIONAL_ROUTE=/learn/wu-xing-tcm-organs/' public/version.txt
+          grep -Fq 'BAZI_OPERATIONAL_ROUTE=/learn/bazi/' public/version.txt
       - name: Validate Railway route contract
         run: python scripts/validate_operational_routes.py
       - name: Build Railway image
