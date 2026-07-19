@@ -9,6 +9,7 @@ COPY content ./content
 COPY research ./research
 RUN python scripts/apply_public_branding.py \
  && python scripts/apply_cornerstone_links.py \
+ && python scripts/normalize_legacy_urls.py \
  && python scripts/validate_public_content.py \
  && python scripts/validate_tcm_organs.py
 
