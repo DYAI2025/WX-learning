@@ -55,6 +55,10 @@ jobs:
           grep -Fq 'BAZI_OPERATIONAL_ROUTE=/learn/bazi/' public/version.txt
       - name: Validate Railway route contract
         run: python scripts/validate_operational_routes.py
+      - name: Restore clean checkout for Docker build
+        run: |
+          git reset --hard HEAD
+          git clean -fdx
       - name: Build Railway image
         run: docker build -t wx-learning-route-check .
       - name: Start container
