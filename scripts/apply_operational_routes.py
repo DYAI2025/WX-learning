@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import re
 import shutil
 from pathlib import Path
 
@@ -10,12 +11,22 @@ WU_XING_ROUTE = "/learn/wu-xing/"
 BAZI_ROUTE = "/learn/bazi/"
 TCM_SOURCE_ROUTE = "/learn/wu-xing/tcm-organs/"
 TCM_PUBLIC_ROUTE = "/learn/wu-xing-tcm-organs/"
+CANONICAL_RE = re.compile(r'<link\s+rel=["\']canonical["\']\s+href=["\'][^"\']+["\']\s*/?>', re.I)
 
 
 def replace_all(path: Path, replacements: dict[str, str]) -> None:
     text = path.read_text(encoding="utf-8")
     for old in sorted(replacements, key=len, reverse=True):
         text = text.replace(old, replacements[old])
+    path.write_text(text, encoding="utf-8")
+
+
+def set_canonical(path: Path, canonical: str) -> None:
+    text = path.read_text(encoding="utf-8")
+    replacement = f'<link rel="canonical" href="{canonical}">'
+    text, count = CANONICAL_RE.subn(replacement, text, count=1)
+    if count != 1:
+        raise SystemExit(f"expected exactly one canonical link in {path}; found {count}")
     path.write_text(text, encoding="utf-8")
 
 
@@ -42,7 +53,6 @@ def main() -> int:
             "https://sizhuatelier.shop/learn/wu-xing/tcm-organs/": f"{ORIGIN}{TCM_PUBLIC_ROUTE}",
         },
     )
-
     replace_all(
         bazi,
         {
@@ -50,7 +60,6 @@ def main() -> int:
             "https://sizhuatelier.shop/learn/wu-xing/": f"{ORIGIN}{WU_XING_ROUTE}",
         },
     )
-
     replace_all(
         tcm_public / "index.html",
         {
@@ -58,6 +67,10 @@ def main() -> int:
             "https://sizhuatelier.shop/learn/wu-xing/": f"{ORIGIN}{WU_XING_ROUTE}",
         },
     )
+
+    set_canonical(wu_xing, f"{ORIGIN}{WU_XING_ROUTE}")
+    set_canonical(bazi, f"{ORIGIN}{BAZI_ROUTE}")
+    set_canonical(tcm_public / "index.html", f"{ORIGIN}{TCM_PUBLIC_ROUTE}")
 
     replace_all(
         sitemap,
