@@ -12,7 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build Railway image
-        run: docker build -t wx-learning-route-check .
+        shell: bash
+        run: |
+          set -o pipefail
+          if ! docker build -t wx-learning-route-check . > build.log 2>&1; then
+            echo "Docker build failed. Last 100 log lines:"
+            tail -n 100 build.log
+            exit 1
+          fi
       - name: Start container
         run: |
           docker run -d --name wx-learning-route-check -p 8080:8080 wx-learning-route-check
