@@ -38,6 +38,7 @@ def main() -> int:
     version = (PUBLIC / "version.txt").read_text(encoding="utf-8")
     for marker in (
         f"PUBLIC_ORIGIN={ORIGIN}",
+        "WU_XING_OPERATIONAL_ROUTE=/learn/wu-xing/",
         "BAZI_OPERATIONAL_ROUTE=/learn/bazi/",
         "TCM_ORGANS_OPERATIONAL_ROUTE=/learn/wu-xing-tcm-organs/",
         "TCM_ORGANS_LEGACY_ROUTE=/learn/wu-xing/tcm-organs/",
