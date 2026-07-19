@@ -7,11 +7,15 @@ COPY scripts ./scripts
 COPY config ./config
 COPY content ./content
 COPY research ./research
-RUN python scripts/apply_public_branding.py \
+COPY src ./src
+RUN python scripts/build_bazi.py \
+ && python scripts/apply_public_branding.py \
  && python scripts/apply_cornerstone_links.py \
  && python scripts/normalize_legacy_urls.py \
  && python scripts/validate_public_content.py \
  && python scripts/validate_tcm_organs.py \
+ && python scripts/apply_bazi_runtime_metadata.py \
+ && python scripts/validate_bazi.py \
  && python scripts/normalize_internal_routes.py
 
 FROM caddy:2-alpine
