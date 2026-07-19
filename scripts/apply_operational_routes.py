@@ -14,8 +14,8 @@ TCM_PUBLIC_ROUTE = "/learn/wu-xing-tcm-organs/"
 
 def replace_all(path: Path, replacements: dict[str, str]) -> None:
     text = path.read_text(encoding="utf-8")
-    for old, new in replacements.items():
-        text = text.replace(old, new)
+    for old in sorted(replacements, key=len, reverse=True):
+        text = text.replace(old, replacements[old])
     path.write_text(text, encoding="utf-8")
 
 
