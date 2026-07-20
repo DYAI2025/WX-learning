@@ -9,6 +9,7 @@ from pathlib import Path
 PAGE = Path("public/learn/bazi/index.html")
 CSS = Path("public/learn/bazi/styles.css")
 JS = Path("public/learn/bazi/app.js")
+IMAGE = Path("public/learn/bazi/wuxing-ohne-kreis.webp")
 VERSION = Path("public/version.txt")
 SITEMAP = Path("public/sitemap.xml")
 CANONICAL = "https://sizhuatelier.shop/learn/bazi/"
@@ -53,7 +54,7 @@ def fail(message: str) -> None:
 
 
 def main() -> int:
-    for path in (PAGE, CSS, JS, VERSION, SITEMAP):
+    for path in (PAGE, CSS, JS, IMAGE, VERSION, SITEMAP):
         if not path.exists(): fail(f"missing artifact: {path}")
     html = PAGE.read_text(encoding="utf-8")
     css = CSS.read_text(encoding="utf-8")
@@ -65,6 +66,10 @@ def main() -> int:
     if 'class="skip-link"' not in html: fail("skip link missing")
     if ":focus-visible" not in css or "prefers-reduced-motion" not in css: fail("focus or reduced-motion CSS missing")
     if "overflow-x:auto" not in css: fail("responsive table overflow missing")
+    if 'src="/learn/bazi/wuxing-ohne-kreis.webp"' not in html: fail("replacement Wu Xing image reference missing")
+    if "Wu Xing diagram showing Wood, Fire, Earth, Metal and Water" not in html: fail("replacement Wu Xing image alt text missing")
+    if "<svg class=\"wuxing-diagram\"" in html: fail("legacy inline Wu Xing SVG still present")
+    if IMAGE.read_bytes()[:4] != b"RIFF" or b"WEBP" not in IMAGE.read_bytes()[:16]: fail("Wu Xing image is not a valid WebP asset")
     for token in ["八字","四柱","干支","天干","地支","日主","藏干","五行","节气","立春","大运","合婚","bāzì","sìzhù","gānzhī","tiāngān","dìzhī","rìzhǔ","cánggān","wǔxíng","jiéqì","lìchūn","dà yùn","héhūn"]:
         if token not in html: fail(f"required terminology missing: {token}")
     for event in ["learn_hub_click","related_page_click","cta_shop_click","cta_etsy_click","cta_bazi_chart_click","section_view","scroll_depth_25","scroll_depth_50","scroll_depth_75","scroll_depth_100","diagram_interaction"]:
@@ -80,7 +85,7 @@ def main() -> int:
     if f"BAZI_BUILD={BUILD}" not in version or "BAZI_ROUTE=/learn/bazi/" not in version: fail("version markers missing")
     if CANONICAL not in SITEMAP.read_text(encoding="utf-8"): fail("sitemap route missing")
     print("PASS: BZG-35 BaZi static validation")
-    print("- STATIC_VALIDATED: semantics, terminology, claims, SEO, links, accessibility hooks and analytics hooks")
+    print("- STATIC_VALIDATED: semantics, terminology, claims, SEO, links, replacement image, accessibility hooks and analytics hooks")
     return 0
 
 
